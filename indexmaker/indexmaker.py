@@ -40,8 +40,10 @@ def compress_and_text(pars):
     for p in pars:
         if numeritation_function(p):
             compressed.append(p.text)
+        elif len(compressed) > 0:
+            compressed[-1] = compressed[-1] + "\n" + p.text
         else:
-            compressed[-1] = compressed[-1] + "\n" + p.text 
+            log.info("Skipping text as before first numeritation: %s" % p.text[:20]+"..." )
     return compressed
 
 # Produce a debugging file to understand where the numeration have gaps 
@@ -124,10 +126,8 @@ def create_raw_index(docx_filename,output_filename,paragraph_style):
 # create the reverse index and output it as a csv file
 def create_structured_index(docx_filename,output_filename,paragraph_style,structure_file):
     doc = import_paragraphs(docx_filename,paragraph_style)
-    # @TODO - To refactor, bad usage of namespaces
-    elaborated_indexer.index_structure = elaborated_indexer.parse_yaml(structure_file)
-    
-    base_index = elaborated_indexer.parse_and_split(doc)
+    index_structure = elaborated_indexer.parse_yaml(structure_file)
+    base_index = elaborated_indexer.parse_and_split(index_structure,doc)
     index = consolidate_index(base_index)
     utils.write_string(output_filename,elaborated_indexer.index_printer(index))
     return 

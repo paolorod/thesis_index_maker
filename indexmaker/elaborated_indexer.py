@@ -34,19 +34,17 @@ def parse_yaml(index_structure_yaml):
                     index_structure[section_title][word][spec] = []
         return index_structure
 
-index_structure = parse_yaml("./data/index_structure.yaml")
-
-def parse_and_split(doc_as_list):
+def parse_and_split(index_structure,doc_as_list):
     log.info("Starting Index Extraction")
     doc_index = list()
     length = len(doc_as_list)-1
     utils.printProgressBar(0, length-1, prefix = 'Progress:', suffix = 'Complete', length = 50)
     for i in range(0,length):
-        doc_index += check_and_emit(doc_as_list[i],i)
+        doc_index += check_and_emit(index_structure,doc_as_list[i],i)
         utils.printProgressBar(i, length-1, prefix = 'Progress:', suffix = 'Complete', length = 50)
     return doc_index
 
-def check_and_emit(paragraph,i):
+def check_and_emit(index_structure,paragraph,i):
     local_index = list()
     for section_title in index_structure.keys():
         for word in index_structure[section_title]:
@@ -66,7 +64,7 @@ def emit_if_present(paragraph,i,section_title,entry,specification):
 def match(word,paragraph):
     return lem.lemmatise(word.lower()) in lem.lemmatise(paragraph).lower()
 
-def index_printer(consolidated_index):
+def index_printer(index_structure,consolidated_index):
     log.info('Printing Structured Index')
     dict_index = index_structure.copy()
 
@@ -92,6 +90,3 @@ def index_printer(consolidated_index):
 
 def page_list_as_string(pagelist):
     return ",".join(map(lambda x:str(x), pagelist))
-
-
-                
